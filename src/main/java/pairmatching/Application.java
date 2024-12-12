@@ -1,7 +1,15 @@
 package pairmatching;
 
+import java.util.List;
+
 public class Application {
     public static void main(String[] args) {
-        // TODO 구현 진행
+        CrewInformationLoader crewInformationLoader = new CrewInformationLoader();
+        CrewInformation crewInformation= crewInformationLoader.getCrewInformation();
+        List<Crew> allCrewInformation=crewInformation.getAllCrewInformation();
+        for(Crew crew:allCrewInformation){
+            System.out.println(crew.getName()+crew.getCourse());
+        }
+
     }
 }
