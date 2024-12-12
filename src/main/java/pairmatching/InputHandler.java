@@ -49,7 +49,6 @@ public class InputHandler {
             try {
                 List<String> parsedList = Parser.parseList(input, delimiter);
 
-
                 inputValidator.validateNotNullOrEmptyList(parsedList);
                 inputValidator.validateListSize(parsedList,3);
                 inputValidator.validatePariMatchingInfo(parsedList);

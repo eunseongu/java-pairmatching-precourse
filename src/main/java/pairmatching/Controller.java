@@ -16,7 +16,6 @@ public class Controller {
     }
 
     public void run() {
-
         CrewInformationLoader crewInformationLoader = new CrewInformationLoader();
         CrewInformation crewInformation = crewInformationLoader.getCrewInformation();
         List<MatchedPairInfo> matchedPairInfo = new ArrayList<>();
@@ -39,40 +38,40 @@ public class Controller {
     }
 
     public void pairMatching(CrewInformation crewInformation, List<MatchedPairInfo> matchedPairInfo) {
-        List<String> pairMatchingInfo = inputHandler.handlePariMatchingInfoInput();
+        List<String> courseLevelMission = inputHandler.handlePariMatchingInfoInput();
         List<List<String>> pairResult = new ArrayList<>();
-        PairMatcher pairMathcer = new PairMatcher();
+        PairMatcher pairMatcher = new PairMatcher();
 
-        int sameMatchingInfoIdx=getSameMatchingInformation(pairMatchingInfo, matchedPairInfo);
-        if(sameMatchingInfoIdx!=-1){
+        int sameMatchingInfoIdx = getSameMatchingInformation(courseLevelMission, matchedPairInfo);
+        if (sameMatchingInfoIdx != -1) {
             String rematchingInput = inputHandler.handleRematchingInput();
-            if(rematchingInput.equals("네")){
+            if (rematchingInput.equals("네")) {
                 matchedPairInfo.remove(sameMatchingInfoIdx);
 
-                pairResult = pairMathcer.runMatching(crewInformation, pairMatchingInfo);
+                pairResult = pairMatcher.runMatching(crewInformation, courseLevelMission);
 
-                while(!isValidMatching(pairResult, matchedPairInfo,pairMatchingInfo)){
-                    pairResult = pairMathcer.runMatching(crewInformation, pairMatchingInfo);
+                while (!isValidMatching(pairResult, matchedPairInfo, courseLevelMission)) {
+                    pairResult = pairMatcher.runMatching(crewInformation, courseLevelMission);
                 }
             }
-        }
-        else{
-            pairResult = pairMathcer.runMatching(crewInformation, pairMatchingInfo);
+        } else {
+            pairResult = pairMatcher.runMatching(crewInformation, courseLevelMission);
 
-            while(!isValidMatching(pairResult, matchedPairInfo,pairMatchingInfo)){
-                pairResult = pairMathcer.runMatching(crewInformation, pairMatchingInfo);
+            while (!isValidMatching(pairResult, matchedPairInfo, courseLevelMission)) {
+                pairResult = pairMatcher.runMatching(crewInformation, courseLevelMission);
             }
         }
-        matchedPairInfo.add(new MatchedPairInfo(pairMatchingInfo, pairResult));
+        matchedPairInfo.add(new MatchedPairInfo(courseLevelMission, pairResult));
 
         outputView.printPairMatchingResult(pairResult);
     }
 
-    private boolean isValidMatching(List<List<String>> pairResult, List<MatchedPairInfo> matchedPairInfo, List<String> pairMatchingInfo){
-        String inputLevel= pairMatchingInfo.get(1);
-        for(MatchedPairInfo info : matchedPairInfo){
+    private boolean isValidMatching(List<List<String>> pairResult, List<MatchedPairInfo> matchedPairInfo,
+                                    List<String> courseLevelMission) {
+        String inputLevel = courseLevelMission.get(1);
+        for (MatchedPairInfo info : matchedPairInfo) {
             String matchedInfoLevel = info.getInformation().get(1);
-            if(matchedInfoLevel.equals(inputLevel)){
+            if (matchedInfoLevel.equals(inputLevel)) {
                 return info.isValidMatching(pairResult);
             }
         }
@@ -80,9 +79,9 @@ public class Controller {
     }
 
 
-    public int getSameMatchingInformation(List<String> pairMatchingInfo, List<MatchedPairInfo> matchedPairInfo){
-        for(int i = 0; i< matchedPairInfo.size(); i++){
-            if(matchedPairInfo.get(i).getInformation().equals(pairMatchingInfo)){
+    public int getSameMatchingInformation(List<String> pairMatchingInfo, List<MatchedPairInfo> matchedPairInfo) {
+        for (int i = 0; i < matchedPairInfo.size(); i++) {
+            if (matchedPairInfo.get(i).getInformation().equals(pairMatchingInfo)) {
                 return i;
             }
         }
