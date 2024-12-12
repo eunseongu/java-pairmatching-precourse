@@ -27,12 +27,12 @@ public class InputHandler {
         }
     }
 
-    public String FUNTMP() {
+    public String handleRematchingInput() {
         while (true) {
-            String input = "1";
+            String input = inputView.readRematching();
             try {
                 inputValidator.validateNotNullOrEmpty(input);
-                inputValidator.validateFunctionInput(input);
+                inputValidator.validateBooleanInput(input);
 
                 return input;
             } catch (IllegalArgumentException e) {
@@ -41,7 +41,6 @@ public class InputHandler {
         }
     }
 
-    // 리스트 입력 처리 프론트엔드, 레벨1, 자동차경주
     public List<String> handlePariMatchingInfoInput() {
         String delimiter = ",";
         while (true) {
@@ -61,24 +60,4 @@ public class InputHandler {
             }
         }
     }
-
-    public List<String> TMP() {
-        String delimiter = ",";
-        while (true) {
-            String input = "프론트엔드, 레벨1, 자동차경주";
-            try {
-                List<String> parsedList = Parser.parseList(input, delimiter);
-
-
-                inputValidator.validateNotNullOrEmptyList(parsedList);
-                inputValidator.validateListSize(parsedList,3);
-                inputValidator.validatePariMatchingInfo(parsedList);
-
-                return parsedList;
-            } catch (IllegalArgumentException e) {
-                inputView.printErrorMessage(e.getMessage());
-            }
-        }
-    }
-
 }

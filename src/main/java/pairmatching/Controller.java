@@ -2,10 +2,8 @@ package pairmatching;
 
 import java.util.ArrayList;
 import java.util.List;
-import pairmatching.crew.Crew;
 import pairmatching.crew.CrewInformation;
 import pairmatching.view.OutputView;
-import camp.nextstep.edu.missionutils.Randoms;
 
 public class Controller {
 
@@ -20,21 +18,19 @@ public class Controller {
     public void run() {
 
         CrewInformationLoader crewInformationLoader = new CrewInformationLoader();
-        CrewInformation crewInformation= crewInformationLoader.getCrewInformation();
-        List<Crew> allCrewInformation=crewInformation.getAllCrewInformation();
-        List<MatchedPair>  matchedPair = new ArrayList<>();
+        CrewInformation crewInformation = crewInformationLoader.getCrewInformation();
+        List<MatchedPairInfo> matchedPairInfo = new ArrayList<>();
 
-        while(true) {
+        while (true) {
             String functionInput = inputHandler.handleFunctionInput();
-//        String functionInput = inputHandler.FUNTMP();
             if (functionInput.equals("1")) {
-                pairMatching(crewInformation, matchedPair);
+                pairMatching(crewInformation, matchedPairInfo);
             }
             if (functionInput.equals("2")) {
-                checkPair();
+                checkPair(matchedPairInfo);
             }
             if (functionInput.equals("3")) {
-                resetPair();
+                resetPair(matchedPairInfo);
             }
             if (functionInput.equalsIgnoreCase("Q")) {
                 break;
@@ -42,57 +38,81 @@ public class Controller {
         }
     }
 
-    public  void pairMatching(CrewInformation crewInformation,List<MatchedPair>  matchedPair){
+    public void pairMatching(CrewInformation crewInformation, List<MatchedPairInfo> matchedPairInfo) {
         List<String> pairMatchingInfo = inputHandler.handlePariMatchingInfoInput();
-//        List<String> pairMatchingInfo = inputHandler.TMP();
+        List<List<String>> pairResult = new ArrayList<>();
+        PairMatcher pairMathcer = new PairMatcher();
 
+        int sameMatchingInfoIdx=getSameMatchingInformation(pairMatchingInfo, matchedPairInfo);
+        if(sameMatchingInfoIdx!=-1){
+            String rematchingInput = inputHandler.handleRematchingInput();
+            if(rematchingInput.equals("네")){
+                matchedPairInfo.remove(sameMatchingInfoIdx);
 
-        List<String> allCrewNames = new ArrayList<>();
-        if(pairMatchingInfo.getFirst().equals("백엔드")){
-            allCrewNames  = crewInformation.getBackEndCrewNames();
-        }
-        if(pairMatchingInfo.getFirst().equals("프론트엔드")){
-            allCrewNames  = crewInformation.getFrontEndCrewNames();
-        }
+                pairResult = pairMathcer.runMatching(crewInformation, pairMatchingInfo);
 
-        List<String> shuffledCrewNames = Randoms.shuffle(allCrewNames);
-
-
-        int crewNumber= shuffledCrewNames.size();
-        List<List<String>> pair= new ArrayList<>();
-
-        // 프론트 홀수
-        if(crewNumber%2!=0){
-            int number;
-            for(number=0;number<crewNumber-3;number+=2){
-                pair.add(List.of(shuffledCrewNames.get(number),shuffledCrewNames.get(number+1)));
-            }
-
-            pair.add(List.of(shuffledCrewNames.get(number),shuffledCrewNames.get(number+1),shuffledCrewNames.get(number+2)));
-        }
-        // 백엔드 짝수
-        if(crewNumber%2==0){
-
-            for(int number=0;number<crewNumber;number+=2){
-                pair.add(List.of(shuffledCrewNames.get(number),shuffledCrewNames.get(number+1)));
+                while(!isValidMatching(pairResult, matchedPairInfo,pairMatchingInfo)){
+                    pairResult = pairMathcer.runMatching(crewInformation, pairMatchingInfo);
+                }
             }
         }
+        else{
+            pairResult = pairMathcer.runMatching(crewInformation, pairMatchingInfo);
 
-        matchedPair.add(new MatchedPair(pairMatchingInfo,pair));
+            while(!isValidMatching(pairResult, matchedPairInfo,pairMatchingInfo)){
+                pairResult = pairMathcer.runMatching(crewInformation, pairMatchingInfo);
+            }
+        }
+        matchedPairInfo.add(new MatchedPairInfo(pairMatchingInfo, pairResult));
 
-        outputView.printPairMatchingResult(pair);
+        outputView.printPairMatchingResult(pairResult);
     }
 
-    public void checkPair(){
+    private boolean isValidMatching(List<List<String>> pairResult, List<MatchedPairInfo> matchedPairInfo, List<String> pairMatchingInfo){
+        String inputLevel= pairMatchingInfo.get(1);
+        for(MatchedPairInfo info : matchedPairInfo){
+            String matchedInfoLevel = info.getInformation().get(1);
+            if(matchedInfoLevel.equals(inputLevel)){
+                return info.isValidMatching(pairResult);
+            }
+        }
+        return true;
+    }
+
+
+    public int getSameMatchingInformation(List<String> pairMatchingInfo, List<MatchedPairInfo> matchedPairInfo){
+        for(int i = 0; i< matchedPairInfo.size(); i++){
+            if(matchedPairInfo.get(i).getInformation().equals(pairMatchingInfo)){
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    public void checkPair(List<MatchedPairInfo> matchedPairInfo) {
+        List<String> pairMatchingInfo = inputHandler.handlePariMatchingInfoInput();
+
+        try {
+            boolean checker = false;
+            for (MatchedPairInfo pair : matchedPairInfo) {
+                if (pair.getInformation().equals(pairMatchingInfo)) {
+                    outputView.printPairMatchingResult(pair.getMatchedCrewInfo());
+                    checker = true;
+                }
+            }
+
+            if (!checker) {
+                throw new IllegalArgumentException("[ERROR] 매칭 이력이 없습니다.");
+            }
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+        }
 
     }
 
-    public void resetPair(){
-
-    }
-
-    public void quit(){
-
+    public void resetPair(List<MatchedPairInfo> matchedPairInfo) {
+        matchedPairInfo.clear();
+        outputView.printResetResult();
     }
 }
 
