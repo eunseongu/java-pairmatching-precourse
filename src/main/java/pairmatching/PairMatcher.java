@@ -6,10 +6,11 @@ import java.util.List;
 import pairmatching.crew.CrewInformation;
 
 public class PairMatcher {
-    public List<List<String>> runMatching(CrewInformation crewInformation, List<String> courseLevelMission) {
-        List<String> shuffledCrewNames = getShuffledCrewNames(crewInformation, courseLevelMission.getFirst());
-        int crewNumber = shuffledCrewNames.size();
+    public List<List<String>> runMatching(CrewInformation crewInformation, String course) {
+
+        List<String> shuffledCrewNames = getShuffledCrewNames(crewInformation, course);
         List<List<String>> pair = new ArrayList<>();
+        int crewNumber = shuffledCrewNames.size();
 
         if (crewNumber % 2 == 0) {
             evenNumberLogic(crewNumber, pair, shuffledCrewNames);

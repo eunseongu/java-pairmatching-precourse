@@ -4,11 +4,11 @@ import java.util.List;
 
 public class MatchedPairInfo {
     private final List<String> information;
-    private final List<List<String>> matchedCrewInfo;
+    private final List<List<String>> matchedPair;
 
-    public MatchedPairInfo(List<String> information, List<List<String>> matchedCrewInfo){
+    public MatchedPairInfo(List<String> information, List<List<String>> matchedPair){
         this.information=information;
-        this.matchedCrewInfo = matchedCrewInfo;
+        this.matchedPair = matchedPair;
     }
 
     public List<String> getInformation(){
@@ -16,16 +16,16 @@ public class MatchedPairInfo {
     }
 
     public void addMatchedCrew(List<String> pair){
-        matchedCrewInfo.add(pair);
+        matchedPair.add(pair);
     }
 
-    public List<List<String>> getMatchedCrewInfo(){
-        return matchedCrewInfo;
+    public List<List<String>> getMatchedPair(){
+        return matchedPair;
     }
 
     public boolean isValidMatching(List<List<String>> pairResult){
         for(List<String> pair:pairResult){
-            if(matchedCrewInfo.contains(pair)){
+            if(matchedPair.contains(pair)){
                 return false;
             }
         }

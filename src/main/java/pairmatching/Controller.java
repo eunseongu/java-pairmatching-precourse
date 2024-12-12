@@ -39,47 +39,70 @@ public class Controller {
 
     public void pairMatching(CrewInformation crewInformation, List<MatchedPairInfo> matchedPairInfo) {
         List<String> courseLevelMission = inputHandler.handlePariMatchingInfoInput();
+        String course=courseLevelMission.getFirst();
+        String level=courseLevelMission.get(1);
+
         List<List<String>> pairResult = new ArrayList<>();
         PairMatcher pairMatcher = new PairMatcher();
 
-        int sameMatchingInfoIdx = getSameMatchingInformation(courseLevelMission, matchedPairInfo);
-        if (sameMatchingInfoIdx != -1) {
+        int sameMatchedPairIdx = findSameMatchedPair(courseLevelMission, matchedPairInfo);
+        try{
+        if (sameMatchedPairIdx != -1) {
             String rematchingInput = inputHandler.handleRematchingInput();
             if (rematchingInput.equals("네")) {
-                matchedPairInfo.remove(sameMatchingInfoIdx);
+                matchedPairInfo.remove(sameMatchedPairIdx);
 
-                pairResult = pairMatcher.runMatching(crewInformation, courseLevelMission);
-
-                while (!isValidMatching(pairResult, matchedPairInfo, courseLevelMission)) {
-                    pairResult = pairMatcher.runMatching(crewInformation, courseLevelMission);
-                }
+                pairResult = getPairResult(pairResult, pairMatcher, crewInformation, course, level);
             }
         } else {
-            pairResult = pairMatcher.runMatching(crewInformation, courseLevelMission);
-
-            while (!isValidMatching(pairResult, matchedPairInfo, courseLevelMission)) {
-                pairResult = pairMatcher.runMatching(crewInformation, courseLevelMission);
-            }
+            pairResult = getPairResult(pairResult, pairMatcher, crewInformation, course, level);
         }
+
         matchedPairInfo.add(new MatchedPairInfo(courseLevelMission, pairResult));
+        crewInformation.updateMatchedCrew(pairResult,level);
 
         outputView.printPairMatchingResult(pairResult);
+        }catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+        }
     }
 
-    private boolean isValidMatching(List<List<String>> pairResult, List<MatchedPairInfo> matchedPairInfo,
-                                    List<String> courseLevelMission) {
-        String inputLevel = courseLevelMission.get(1);
-        for (MatchedPairInfo info : matchedPairInfo) {
-            String matchedInfoLevel = info.getInformation().get(1);
-            if (matchedInfoLevel.equals(inputLevel)) {
-                return info.isValidMatching(pairResult);
+    private List<List<String>> getPairResult(List<List<String>> pairResult, PairMatcher pairMatcher,
+                                             CrewInformation crewInformation, String course, String level) {
+
+        pairResult = pairMatcher.runMatching(crewInformation, course);
+
+        int count = 0;
+        while (!isValidMatchingCrewVer(pairResult, level, crewInformation)) {
+            count++;
+            pairResult = pairMatcher.runMatching(crewInformation, course);
+            if (count == 3) {
+                throw new IllegalArgumentException("[ERROR] 매칭에 실패했습니다.");
+            }
+        }
+        return pairResult;
+    }
+
+    private boolean isValidMatchingCrewVer(List<List<String>> pairResult, String level,CrewInformation crewInformation) {
+
+        for(List<String> pair:pairResult){
+            if(pair.size()==2){
+                if(crewInformation.findCrew(pair.getFirst()).isAlreadyMatched(pair.get(1),level)){
+                    return false;
+                }
+            }
+            if(pair.size()==3){
+                if(crewInformation.findCrew(pair.getFirst()).isAlreadyMatched(pair.get(1),level) ||
+                        crewInformation.findCrew(pair.getFirst()).isAlreadyMatched(pair.get(2),level)){
+                    return false;
+                }
             }
         }
         return true;
     }
 
 
-    public int getSameMatchingInformation(List<String> pairMatchingInfo, List<MatchedPairInfo> matchedPairInfo) {
+    public int findSameMatchedPair(List<String> pairMatchingInfo, List<MatchedPairInfo> matchedPairInfo) {
         for (int i = 0; i < matchedPairInfo.size(); i++) {
             if (matchedPairInfo.get(i).getInformation().equals(pairMatchingInfo)) {
                 return i;
@@ -95,7 +118,7 @@ public class Controller {
             boolean checker = false;
             for (MatchedPairInfo pair : matchedPairInfo) {
                 if (pair.getInformation().equals(pairMatchingInfo)) {
-                    outputView.printPairMatchingResult(pair.getMatchedCrewInfo());
+                    outputView.printPairMatchingResult(pair.getMatchedPair());
                     checker = true;
                 }
             }
