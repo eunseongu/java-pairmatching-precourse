@@ -1,4 +1,4 @@
-package pairmatching;
+package pairmatching.constants;
 
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package pairmatching;
+package pairmatching.view;
 
 public class OutputView {
     public void printOutputMessage(String message) {

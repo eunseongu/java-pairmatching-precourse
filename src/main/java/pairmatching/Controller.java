@@ -1,6 +1,9 @@
 package pairmatching;
 
 import java.util.List;
+import pairmatching.crew.Crew;
+import pairmatching.crew.CrewInformation;
+import pairmatching.view.OutputView;
 
 public class Controller {
 

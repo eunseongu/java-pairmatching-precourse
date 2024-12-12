@@ -1,4 +1,4 @@
-package pairmatching;
+package pairmatching.crew;
 
 public class Crew {
     private String course;

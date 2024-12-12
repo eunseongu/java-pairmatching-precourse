@@ -1,7 +1,7 @@
 package pairmatching;
 
-import java.util.ArrayList;
 import java.util.List;
+import pairmatching.view.InputView;
 
 public class InputHandler {
 

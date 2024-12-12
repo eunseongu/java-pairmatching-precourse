@@ -1,4 +1,4 @@
-package pairmatching;
+package pairmatching.constants;
 
 public enum ErrorMessage {
     INVALID_COURSE("유효하지 않은 과정입니다."),

@@ -3,6 +3,8 @@ package pairmatching;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import pairmatching.crew.Crew;
+import pairmatching.crew.CrewInformation;
 
 public class CrewInformationLoader {
     CrewInformation crewInformation = new CrewInformation();
